@@ -25,15 +25,27 @@ The menu also has a **Keep Awake Now** switch (on by default). It holds a power 
 
 Status reads: ✅ done · ⚠️ one click fixes it · 👉 you need to do it in System Settings · ⚪️ optional and not set.
 
+## Updates
+
+Wakeful checks for updates once a day, and from **Check for Updates…** in the menu, using [Sparkle](https://sparkle-project.org). When a new version is found, the menu shows "Update Available" and Sparkle offers to install and relaunch.
+
+- Each GitHub release on this repo carries the zip and the update feed (`appcast.xml`). The app reads `releases/latest/download/appcast.xml`, so the newest release is what installed copies are offered.
+- Every update zip is signed with an EdDSA key stored in the login keychain (Sparkle account `wakeful`). The app only installs updates signed with that key, from the same Developer ID.
+- The key is backed up outside this repo. Never generate a new one: existing installs would reject every update. To restore it on a new Mac, save it to a file, run `vendor/Sparkle/bin/generate_keys --account wakeful -f <file>`, then delete the file.
+
 ## Build
 
 ```sh
-./build.sh        # ad-hoc signed → build/Wakeful.app and build/Wakeful.zip
-SIGN_ID=890FA343CE318ACF071F9E588B18A2CD442B1A7E NOTARY_PROFILE=svar-notary ./build.sh   # signed + notarized
+./build.sh                    # ad-hoc signed, for local testing → build/Wakeful.app
 ```
+
+## Release
+
+1. Bump `CFBundleShortVersionString` and `CFBundleVersion` (+1) in `Resources/Info.plist`, and commit.
+2. `scripts/release.sh "What changed"`
+
+This builds, signs with Developer ID, notarizes, signs the update for Sparkle, writes `appcast.xml`, tags the commit, and publishes the GitHub release. Installed copies pick it up within a day.
 
 ## Install on another Mac
 
-1. Copy `build/Wakeful.zip` over (AirDrop, USB, `scp`), unzip, and move `Wakeful.app` to /Applications.
-2. Release builds are signed and notarized, so they open without a Gatekeeper warning.
-3. Launch it. The setup window opens, so click **Fix All**.
+Download the latest zip from [Releases](https://github.com/rajatkapoor/wakeful/releases/latest), unzip, move `Wakeful.app` to Applications, open it and click **Fix All**. Builds are notarized, so there's no Gatekeeper warning.

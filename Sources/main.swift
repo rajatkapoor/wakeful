@@ -5,6 +5,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusItem: NSStatusItem!
     private let state = SystemState()
     private let keepAwake = KeepAwake()
+    private let updater = Updater()
     private var window: NSWindow?
     private let defaults = UserDefaults.standard
 
@@ -16,6 +17,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let menu = NSMenu()
         menu.delegate = self
         statusItem.menu = menu
+
+        updater.onChange = { [weak self] in self?.updateIcon() }
+        if CommandLine.arguments.contains("--check-updates") { updater.checkForUpdates() }
 
         state.refresh()
         updateIcon()
@@ -77,6 +81,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(fixAll)
         menu.addItem(item("Open Setup Guide…", #selector(openSetup)))
         menu.addItem(.separator())
+        if let version = updater.availableVersion {
+            menu.addItem(item("⬆️  Update Available: Version \(version)…", #selector(checkForUpdates)))
+        } else {
+            menu.addItem(item("Check for Updates…", #selector(checkForUpdates)))
+        }
+        let current = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+        menu.addItem(disabled("Wakeful \(current)"))
         menu.addItem(item("Quit Wakeful", #selector(quit)))
     }
 
@@ -137,6 +148,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NSApp.activate(ignoringOtherApps: true)
         window?.makeKeyAndOrderFront(nil)
     }
+
+    @objc private func checkForUpdates() { updater.checkForUpdates() }
 
     @objc private func quit() { NSApp.terminate(nil) }
 }
