@@ -106,10 +106,11 @@ final class SystemState: ObservableObject {
         let disk = pm["disksleep"] ?? "?"
         list.append(Check(
             id: "disksleep", title: "Never spin down disks",
-            why: "Prevents external/internal disks from sleeping, which causes stalls for servers and backups.",
-            status: disk == "0" ? .ok : .needsFix,
+            why: "Only matters for spinning hard drives (e.g. an external HDD for backups). SSDs are unaffected, so this is safe to leave alone.",
+            status: disk == "0" ? .ok : .optional,
             current: disk == "0" ? "Disk sleep: Never" : "Disk sleep after \(disk) min",
-            fix: .admin(["/usr/bin/pmset \(scope) disksleep 0"])))
+            fix: .admin(["/usr/bin/pmset \(scope) disksleep 0"]),
+            required: false))
 
         if let womp = pm["womp"] {
             list.append(Check(

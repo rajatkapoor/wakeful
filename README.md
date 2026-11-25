@@ -9,7 +9,7 @@ Universal binary (Apple silicon + Intel), macOS 11 Big Sur or later.
 | Item | How it's fixed |
 |---|---|
 | Never sleep automatically | `pmset sleep 0` (laptops: charger profile only) |
-| Never spin down disks | `pmset disksleep 0` |
+| Never spin down disks (optional, HDDs only) | `pmset disksleep 0` |
 | Wake for network access | `pmset womp 1` |
 | Start up after a power failure (desktops) | `pmset autorestart 1` |
 | Power Nap off (optional) | `pmset powernap 0` |
