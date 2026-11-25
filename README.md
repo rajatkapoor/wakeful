@@ -29,13 +29,11 @@ Status reads: ✅ done · ⚠️ one click fixes it · 👉 you need to do it in
 
 ```sh
 ./build.sh        # ad-hoc signed → build/Wakeful.app and build/Wakeful.zip
-SIGN_ID="Developer ID Application: …" NOTARY_PROFILE=wakeful-notary ./build.sh   # signed + notarized
+SIGN_ID=890FA343CE318ACF071F9E588B18A2CD442B1A7E NOTARY_PROFILE=svar-notary ./build.sh   # signed + notarized
 ```
 
 ## Install on another Mac
 
 1. Copy `build/Wakeful.zip` over (AirDrop, USB, `scp`), unzip, and move `Wakeful.app` to /Applications.
-2. The app is ad-hoc signed, not notarized, so Gatekeeper blocks the first launch. Either:
-   - open it once, then go to System Settings → Privacy & Security and click **Open Anyway**, or
-   - run `xattr -dr com.apple.quarantine /Applications/Wakeful.app`
+2. Release builds are signed and notarized, so they open without a Gatekeeper warning.
 3. Launch it. The setup window opens, so click **Fix All**.
