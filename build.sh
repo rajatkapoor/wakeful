@@ -14,6 +14,24 @@ lipo -create build/Wakeful-arm64 build/Wakeful-x86_64 -output "$APP/Contents/Mac
 rm build/Wakeful-arm64 build/Wakeful-x86_64
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 
-codesign --force --deep --sign - "$APP"
+# SIGN_ID: a "Developer ID Application" identity (defaults to ad-hoc "-").
+# NOTARY_PROFILE: a profile saved with `xcrun notarytool store-credentials` (optional).
+SIGN_ID="${SIGN_ID:--}"
+if [ "$SIGN_ID" = "-" ]; then
+  codesign --force --sign - "$APP"
+else
+  codesign --force --options runtime --timestamp \
+    --entitlements Resources/Wakeful.entitlements --sign "$SIGN_ID" "$APP"
+fi
+codesign --verify --strict "$APP"
+
 (cd build && ditto -c -k --keepParent Wakeful.app Wakeful.zip)
+
+if [ -n "$NOTARY_PROFILE" ]; then
+  xcrun notarytool submit build/Wakeful.zip --keychain-profile "$NOTARY_PROFILE" --wait
+  xcrun stapler staple "$APP"
+  rm build/Wakeful.zip
+  (cd build && ditto -c -k --keepParent Wakeful.app Wakeful.zip)
+  spctl --assess --type execute -vv "$APP"
+fi
 echo "Built $APP and build/Wakeful.zip"

@@ -28,7 +28,8 @@ Status reads: ✅ done · ⚠️ one click fixes it · 👉 you need to do it in
 ## Build
 
 ```sh
-./build.sh        # → build/Wakeful.app and build/Wakeful.zip
+./build.sh        # ad-hoc signed → build/Wakeful.app and build/Wakeful.zip
+SIGN_ID="Developer ID Application: …" NOTARY_PROFILE=wakeful-notary ./build.sh   # signed + notarized
 ```
 
 ## Install on another Mac
