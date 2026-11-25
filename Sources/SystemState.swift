@@ -103,15 +103,6 @@ final class SystemState: ObservableObject {
             current: sleep == "0" ? "System sleep: Never" : "System sleep after \(sleep) min",
             fix: .admin(["/usr/bin/pmset \(scope) sleep 0"])))
 
-        let disk = pm["disksleep"] ?? "?"
-        list.append(Check(
-            id: "disksleep", title: "Never spin down disks",
-            why: "Only matters for spinning hard drives (e.g. an external HDD for backups). SSDs are unaffected, so this is safe to leave alone.",
-            status: disk == "0" ? .ok : .optional,
-            current: disk == "0" ? "Disk sleep: Never" : "Disk sleep after \(disk) min",
-            fix: .admin(["/usr/bin/pmset \(scope) disksleep 0"]),
-            required: false))
-
         if let womp = pm["womp"] {
             list.append(Check(
                 id: "womp", title: "Wake for network access",
